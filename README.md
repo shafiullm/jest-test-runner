@@ -71,7 +71,8 @@ root/
    - `correct.js` - Correct implementation
    - `incorrect.js` - Implementation with known issues
    - `index.test.js` - Test file for all implementations
-Note: You can add additional files if you want to run the unit test against them, such as the JavaScript files for the models.
+
+   **Note:** You can add additional files if you want to run the unit test against them, such as the JavaScript files for the models.
 
 ## Usage
 
