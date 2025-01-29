@@ -60,7 +60,12 @@ tasks/
 │       └── ...
 ├── task2/
 │   ├── index.test.js
-│   └── solution.js
+│   ├── solution.js
+│   ├── base_code.js
+│   └── alternate_responses/
+│       ├── model1.js
+│       ├── model2.js
+│       └── ...
 └── ...
 ```
 
