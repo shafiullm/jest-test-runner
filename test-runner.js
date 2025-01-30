@@ -8,13 +8,22 @@ async function runTests(taskId) {
     const testFilePath = path.join(taskDir, 'index.test.js');
     const originalTestContent = fs.readFileSync(testFilePath, 'utf8');
     
-    // Extract the original function name and import pattern
-    const requireMatch = originalTestContent.match(/const\s*{([^}]+)}\s*=\s*require\(['"]\.\/[^'"]+['"]\)/);
-    if (!requireMatch) {
+     // Match both import patterns: destructured ({ func }) and direct (ClassName)
+    const destructuredMatch = originalTestContent.match(/const\s*{([^}]+)}\s*=\s*require\(['"]\.\/[^'"]+['"]\)/);
+    const directMatch = originalTestContent.match(/const\s+([^=\s]+)\s*=\s*require\(['"]\.\/[^'"]+['"]\)/);
+    
+    // Determine the import pattern based on the original test file
+    let importPattern;
+    if (destructuredMatch) {
+        const functionName = destructuredMatch[1].trim();
+        importPattern = `const { ${functionName} } = require`;
+    } else if (directMatch) {
+        const className = directMatch[1].trim();
+        importPattern = `const ${className} = require`;
+    } else {
         console.error('Could not find require statement in test file');
         process.exit(1);
     }
-    const functionImport = requireMatch[1].trim();
     
     // Initialize summary object
     const testSummary = {};
@@ -54,12 +63,12 @@ async function runTests(taskId) {
     // Run tests for each implementation
     for (const file of filesToTest) {
         console.log(`\nTesting implementation: ${file.name}`);
-        console.log('='.repeat(42));
+        console.log('='.repeat(40));
         
         // Modify the import statement in the test file
         const newTestContent = originalTestContent.replace(
-            /const\s*{[^}]+}\s*=\s*require\(['"]\.\/[^'"]+['"]\)/,
-            `const { ${functionImport} } = require('${file.path}')`
+            /const\s*(?:{[^}]+}|[^=\s]+)\s*=\s*require\(['"]\.\/[^'"]+['"]\)/,
+            `${importPattern}('${file.path}')`
         );
         
         // Write the modified test file
